@@ -66,6 +66,11 @@ namespace abook_parser
             }
         }
 
+        if(act != NULL && act->keys.begin() != act->keys.end())
+            cts.push_back(act);
+        else if(act != NULL)
+            delete act;
+
         return cts;
     }
 
@@ -74,6 +79,26 @@ namespace abook_parser
         for(size_t i = 0; i < cts.size(); ++i)
             delete cts[i];
         cts.clear();
+    }
+    
+    bool save(const Contacts& cts, const std::string& path)
+    {
+        std::ofstream ofs(path.c_str(), std::ios::trunc);
+        if(!ofs)
+            return false;
+
+        ofs << "# abook addressbook file\n\n[format]\nprogram=abook\nversion=0.6.0pre2\n\n" << std::endl;
+        int nb = 0;
+        for(size_t i = 0; i < cts.size(); ++i) {
+            std::map<std::string,std::string>::iterator it = cts[i]->keys.begin();
+            ofs << "[" << nb << "]" << std::endl;
+            for(; it != cts[i]->keys.end(); ++it)
+                ofs << it->first << "=" << it->second << std::endl;
+            ofs << std::endl;
+            ++nb;
+        }
+
+        return true;
     }
 
 }
